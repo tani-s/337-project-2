@@ -5,7 +5,10 @@ from unicodedata import numeric
 
 
 # credit to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
-# this will work for proper fractions, like 3⅕ etc. 
+
+# When given a fraction (or int), returns it as a float. 
+# When given a non-digit string, returns False. 
+# this will work for mixed numbers, like 3⅕ etc. 
 def fraction_handler(num):
     if len(num) == 1:
         v = numeric(num)
@@ -13,13 +16,12 @@ def fraction_handler(num):
         # normal number, ending in [0-9]
         v = float(num)
     elif not num[-1].isdigit():
-        # no digits
+        # no digits. 
         return False
     else:
         # Assume the last character is a vulgar fraction
         v = float(num[:-1]) + numeric(num[-1])
     return v
-#print(fraction_handler('cup'))
 
 url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
 

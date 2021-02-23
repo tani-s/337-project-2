@@ -4,8 +4,22 @@ import requests
 from unicodedata import numeric
 
 
-# credit to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
+url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
 
+measure = ['cup', 'tablespoon', 'teaspoon', 'gram', 'pound', 
+        'cups', 'tablespoons', 'teaspoons', 'grams', 'pounds']
+# incomplete, but a start
+
+tools = {"cut": "knife",
+        "chop": "knife",
+        "slice": "knife",
+        "mince": "knife",
+        "whisk": "whisk",  # "whisk with a fork" is a possibility... 
+        "grate": "grater",
+        "stir": "spoon"}
+
+
+# credit for this function to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
 # When given a fraction (or int), returns it as a float. 
 # When given a non-digit string, returns False. 
 # this will work for mixed numbers, like 3⅕ etc. 
@@ -23,11 +37,8 @@ def fraction_handler(num):
         v = float(num[:-1]) + numeric(num[-1])
     return v
 
-url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
 
-measure = ['cup', 'tablespoon', 'teaspoon', 'gram', 'pound' ]
-# will also need plurals
-
+# given a URL, will return the name of the recipe
 def get_recipe_name(url):
     page = requests.get(url)
     soup = BeautifulSoup(page.content, 'html.parser')
@@ -35,8 +46,9 @@ def get_recipe_name(url):
     recipe_name = soup.find("h1", class_="headline heading-content").text
     return recipe_name
 
+
 # given a URL, returns a dictionary of ingredients that maps to a list containing
-#   the amount in index 0 and the measure at index 1. 
+#   the amount (in index 0) and the measure (index 1). 
 def get_ingredients(url):
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -50,6 +62,7 @@ def get_ingredients(url):
         ing_dict[lst[2]] = [lst[0], lst[1]]
 
     return ing_dict
+
 
 # helper function for get_ingredients.
 def parse_ingredients(ing):
@@ -69,6 +82,25 @@ def parse_ingredients(ing):
     
     desc = ' '.join(desc)
     return [amt, mes, desc]
-    
+#print(get_ingredients(url))
 
-print(get_ingredients(url))
+
+# When given a url, returns a list of tools based on the tools dict defined at top
+# We should probably add something to scan for ... Nouns? things like "oven", "pan", "plate", etc.
+# Also for phrases like "With a spoon, xyz" or "use a spatula to xyz"
+def get_tools(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    instructions = j[1]['recipeInstructions']
+
+    tool=[]
+    for step in instructions:
+        for word in step['text'].lower().split():
+            if word in tools:
+                tool.append(tools[word])
+
+    return tool
+
+print(get_tools(url))

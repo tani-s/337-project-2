@@ -6,6 +6,8 @@ from unicodedata import numeric
 
 url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
 
+url2 = 'https://www.allrecipes.com/recipe/228122/herbed-scalloped-potatoes-and-onions/'
+
 measure = ['cup', 'tablespoon', 'teaspoon', 'gram', 'pound', 
         'cups', 'tablespoons', 'teaspoons', 'grams', 'pounds']
 # incomplete, but a start
@@ -104,3 +106,21 @@ def get_tools(url):
     return tool
 
 print(get_tools(url))
+
+# returns the given steps of the recipe, as laid out on the web page
+# could be split into more steps, by looking for imperatives? each imperative verb starts a new step?
+def get_steps(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    instructions = j[1]['recipeInstructions']
+
+    steps = []
+    for step in instructions:
+        steps.append(step['text'].lower().strip())
+    return steps
+
+#print(get_ingredients(url2))
+#print(get_tools(url2))
+#print(get_steps(url2))

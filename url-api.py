@@ -23,7 +23,14 @@ tools = {"cut": "knife",
 
 methods = ["saute", "boil", "bake", "sear", "braise", "fry", "poach"]
 
+<<<<<<< Updated upstream
 time_measure = ["second", "seconds", "minute", "minutes", "hour", "hours"]
+=======
+health_sub = {"butter": "olive oil",
+        "sugar": "zero calorie sweetener",
+        "lard": "olive oil"}
+
+>>>>>>> Stashed changes
 
 # credit for this function to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
 # When given a fraction (or int), returns it as a float.
@@ -175,10 +182,55 @@ def get_method(url):
                 main_method = i[0]
     return main_method
 
+def healthify(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    instructions = j[1]['recipeInstructions']
+
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    ingredients = j[1]['recipeIngredient']
+
+    ing_dict = {}
+    for ing in ingredients:
+        lst = parse_ingredients(ing)
+        ing_dict[health_sub_help(lst[2])] = [lst[0], lst[1]]
+
+    steps = []
+    for step in instructions:
+        steps.append(health_sub_help(step['text'].lower().strip()))
+    return ing_dict, steps
+
+def health_sub_help(step):
+    next = step
+    for i in health_sub:
+        next = next.replace(i, health_sub[i])
+    return next
+
+
+# credit for this function to https://stackoverflow.com/questions/4664850/how-to-find-all-occurrences-of-a-substring
+def find_all(a_str, sub):
+    start = 0
+    while True:
+        start = a_str.find(sub, start)
+        if start == -1: return
+        yield start
+        start += len(sub) # use start += 1 to find overlapping matches
 
 
 
-
+<<<<<<< Updated upstream
 #print(get_ingredients(url2))
 #print(get_tools(url2))
 #print(get_method(url2))
+=======
+print(get_ingredients(url2))
+print(get_tools(url2))
+print(get_steps(url2))
+print(get_method(url2))
+print(healthify(url2))
+>>>>>>> Stashed changes

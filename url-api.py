@@ -23,6 +23,7 @@ tools = {"cut": "knife",
 
 methods = ["saute", "boil", "bake", "sear", "braise", "fry", "poach"]
 
+time_measure = ["second", "seconds", "minute", "minutes", "hour", "hours"]
 
 # credit for this function to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
 # When given a fraction (or int), returns it as a float.
@@ -108,7 +109,7 @@ def get_tools(url):
 
     return tool
 
-print(get_tools(url))
+#print(get_tools(url))
 
 # returns the given steps of the recipe, as laid out on the web page
 # could be split into more steps, by looking for imperatives? each imperative verb starts a new step?
@@ -118,11 +119,40 @@ def get_steps(url):
     s = soup.find('script', type='application/ld+json')
     j = json.loads(s.string)
     instructions = j[1]['recipeInstructions']
+    ingredients = get_ingredients(url)
+    #print(ingredients)
+    tools = get_tools(url)
+    #print(tools)
 
-    steps = []
+    # dict of steps, key is step number, value is [method, ingredients, tools, time]
+    # i want to split each step into chunks starting with the verbs
+    steps = {}
+    step_num = 0
     for step in instructions:
-        steps.append(step['text'].lower().strip())
+        sents = nltk.sent_tokenize(step['text'].lower().strip())
+        for sent in sents:
+            step_num += 1
+            words = nltk.word_tokenize(sent)
+            words = nltk.pos_tag(words)
+            # bc first word is always the action verb
+            method = [words[0][0]]
+            ingred = []
+            tools = []
+            time = None
+            for word in words:
+                if word[1] == 'VB':
+                    method.append(word[0]) 
+                if word[0] in time_measure:
+                    # how to get the word before the time??
+                    time = word[0]           
+                if word[1] == 'NN':
+                    if word[0] in tools:
+                        tools.append(word[0])
+                    else: ingred.append(word[0])
+            steps[step_num] = [method, ingred, tools, time]
     return steps
+
+#print(get_steps(url))
 
 def get_method(url):
     page = requests.get(url)
@@ -149,7 +179,6 @@ def get_method(url):
 
 
 
-print(get_ingredients(url2))
-print(get_tools(url2))
-print(get_steps(url2))
-print(get_method(url2))
+#print(get_ingredients(url2))
+#print(get_tools(url2))
+#print(get_method(url2))

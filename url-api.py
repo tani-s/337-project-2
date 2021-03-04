@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 from unicodedata import numeric
 import nltk
+from transform import transform
 
 
 url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
@@ -30,6 +31,17 @@ health_sub = {"butter": "olive oil",
         "sugar": "zero calorie sweetener",
         "lard": "olive oil"}
 
+
+Lithuanian_sub = {"vegetable oil": "flaxseed oil", "coconut oil": "flaxseed oil", "olive oil": "flaxseed oil",
+     "hot dog": "skilandis", "bratwurst": "skilandis", "salami": "skilandis",
+     "beer": "farmhouse brewed beer", "wine": "fruit wine","coffee": "kava",
+     "goose": "chicken", "mutton": "lamb", "veal": "lamb", "rabbit": "lamb",
+     "walleye": "zander", "cod": "perch", "tuna": "pike",
+     "basil": "bay leaf", "rosemary": "caraway", "thyme": "coriander" ,"parsley": "horseradish", 
+     "wheat bread": "rye bread", "bagel": "rye bread", "biscuit": "rye bread", "brioche": "rye",
+     "ciabatta":"rye", "naan": "rye bread","pita": "rye bread",
+     "lemon": "apple", "orange": "apricot", "pineapple": "plum", "banana": "pear",
+     "lettuce": "cabbage"}
 
 # credit for this function to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
 # When given a fraction (or int), returns it as a float.

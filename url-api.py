@@ -50,6 +50,9 @@ Lithuanian_sub = {"vegetable oil": "flaxseed oil", "coconut oil": "flaxseed oil"
      "lemon": "apple", "orange": "apricot", "pineapple": "plum", "banana": "pear",
      "lettuce": "cabbage"}
 
+dairy_free_sub = {"milk": "soy milk", "butter": "coconut oil", "cream": "coconut cream", 
+    "parmesan": "nutritional yeast", "yogurt": "applesauce", "mayonnaise": "vegenaise", "cheese": "vegan cheese"}
+
 # credit for this function to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
 # When given a fraction (or int), returns it as a float.
 # When given a non-digit string, returns False.
@@ -145,7 +148,7 @@ def get_tools(url):
 
 #print(get_tools(url))
 
-# returns the given steps of the recipe, as laid out on the web page
+# returns the given steps of the recipe in a list, split by sentence
 # could be split into more steps, by looking for imperatives? each imperative verb starts a new step?
 def get_steps(url):
     page = requests.get(url)
@@ -153,38 +156,46 @@ def get_steps(url):
     s = soup.find('script', type='application/ld+json')
     j = json.loads(s.string)
     instructions = j[1]['recipeInstructions']
-    ingredients = get_ingredients(url)
-    #print(ingredients)
-    tools = get_tools(url)
-    #print(tools)
 
-    # dict of steps, key is step number, value is [method, ingredients, tools, time]
-    # i want to split each step into chunks starting with the verbs
-    steps = {}
-    step_num = 0
+    steps = []
     for step in instructions:
-        sents = nltk.sent_tokenize(step['text'].lower().strip())
-        for sent in sents:
-            step_num += 1
-            words = nltk.word_tokenize(sent)
-            words = nltk.pos_tag(words)
-            # bc first word is always the action verb
-            method = [words[0][0]]
-            ingred = []
-            tools = []
-            time = None
-            for word in words:
-                if word[1] == 'VB':
-                    method.append(word[0]) 
-                if word[0] in time_measure:
-                    # how to get the word before the time??
-                    time = word[0]           
-                if word[1] == 'NN':
-                    if word[0] in tools:
-                        tools.append(word[0])
-                    else: ingred.append(word[0])
-            steps[step_num] = [method, ingred, tools, time]
+        ss = nltk.sent_tokenize(step['text'].lower().strip())
+        for s in ss:
+            steps.append(s)
     return steps
+
+    # below was trying to use a pos tagger to parse out verbs and nouns into ingredients/tools
+    # partially not working bc pos tagger is labeling things wrong, partially bc of ingredients
+    # with two words (lemon juice) gets split up
+    '''ingredients = get_ingredients(url)
+    tools = get_tools(url)
+    instruc = {}
+    step_num = 0
+    for sent in steps:
+        step_num += 1
+        text = nlp(sent)
+        ingred = []
+        tools = []
+        time = None
+        method = []
+        for i in ingredients:
+            if i in sent:
+                ingred.append(i)
+        if text[0].pos_ != 'VERB':
+            method.append(text[0])
+        # first word automatically a method
+        for word in text:
+            if word.pos_ == 'VERB':
+                method.append(word) 
+            #elif word.pos_ == 'NOUN':
+            #    if word in tools:
+            #        tools.append()
+            #    elif word.dep_ == 'dobj': 
+            #        ingred.append(word)
+
+        instruc[step_num] = [method, tools, ingred]
+    return instruc'''
+
 
 #print(get_steps(url))
 
@@ -367,6 +378,8 @@ def url_to_recipe(url):
 print(transform(url, veggies.veg_sub))
 
 print(transform(url2, veggies.veg_sub))
+
+#print(transform(url2, dairy_free_sub))
 
 # ok, issue:
 #   it's getting the first thing to come up in veggies, or it isn't getting multi-word replacements.

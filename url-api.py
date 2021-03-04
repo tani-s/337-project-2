@@ -3,6 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 from unicodedata import numeric
 import nltk
+import re
 from pattern.en import pluralize
 import veggies
 
@@ -375,9 +376,9 @@ def url_to_recipe(url):
 
 # print(url_to_recipe(url2))
 
-print(transform(url, veggies.veg_sub))
+#print(transform(url, veggies.veg_sub))
 
-print(transform(url2, veggies.veg_sub))
+#print(transform(url2, veggies.veg_sub))
 
 #print(transform(url2, dairy_free_sub))
 
@@ -386,3 +387,46 @@ print(transform(url2, veggies.veg_sub))
 #   see: chicken broth. should -> veggie broth, but instead gets chicken -> seitan without seeing "broth"
 #   i may have to implement something that gets the longest possible matching key, if it doesn't go one word at a time
 # also, lmao, "peel" is getting turned into "ptofu" because of the word "eel". the transform tool probs needs some work
+
+
+def veg_transform(url):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    instructions = j[1]['recipeInstructions']
+
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    ingredients = j[1]['recipeIngredient']
+
+    ing_dict = {}
+    for ing in ingredients:
+        lst = parse_ingredients(ing)
+        ing_dict[veg_transform_help(lst[2])] = [lst[0], lst[1]]
+
+    steps = []
+    for step in instructions:
+        steps.append(veg_transform_help(step['text'].lower().strip()))
+    return ing_dict, steps
+
+def veg_transform_help(step):
+    n = step
+    for k in sorted(veggies.veg_sub, key= len, reverse=True):
+        rep = r"\b" + k
+        n = re.sub(rep, veggies.veg_sub[k], n)
+        #n.replace(k, veggies.veg_sub[k])
+    return n
+
+#k = 'chicken'
+#regex = r"\b" + k
+
+#print(regex)
+#print(re.sub(regex, 'tofu', 'low-sodium chicken broth'))
+print(veg_transform(url))
+
+
+
+

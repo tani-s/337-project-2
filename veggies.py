@@ -3,7 +3,7 @@
 # i.e., milk, eggs, cheese, and butter allowed, but not meat.
 
 veg_sub = {
-    #'chicken': "seitan",
+    'chicken': "seitan",
     "pork" : "portobello",
     'fish sauce': 'hoisin',
     'oyster sauce': 'hoisin',
@@ -31,7 +31,7 @@ animals = [
 
 # can't forget plurals... 
 products_2 = [
-    'xxx bouillon', 'xxx broth', 'xxx stock', 'xxx juice',  'xxx sauce', 'xxx seasoning'
+    'xxx bouillon', 'xxx broth', 'xxx stock', 'xxx juice',  'xxx sauce', 'xxx seasoning',
     'xxx patty', 'xxx burger', 'xxx sausage', 'xxx bacon', 'xxx meatball', 'xxx hot dog', 
     
 ]

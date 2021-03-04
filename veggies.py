@@ -3,7 +3,7 @@
 # i.e., milk, eggs, cheese, and butter allowed, but not meat.
 
 veg_sub = {
-    'chicken': "seitan",
+    #'chicken': "seitan",
     "pork" : "portobello",
     'fish sauce': 'hoisin',
     'oyster sauce': 'hoisin',

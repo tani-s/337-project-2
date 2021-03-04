@@ -372,3 +372,4 @@ print(transform(url2, veggies.veg_sub))
 #   it's getting the first thing to come up in veggies, or it isn't getting multi-word replacements.
 #   see: chicken broth. should -> veggie broth, but instead gets chicken -> seitan without seeing "broth"
 #   i may have to implement something that gets the longest possible matching key, if it doesn't go one word at a time
+# also, lmao, "peel" is getting turned into "ptofu" because of the word "eel". the transform tool probs needs some work

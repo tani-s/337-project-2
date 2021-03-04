@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import requests
 from unicodedata import numeric
 import nltk
+from pattern.en import pluralize
+import veggies
 
 
 
@@ -11,7 +13,12 @@ url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
 url2 = 'https://www.allrecipes.com/recipe/228122/herbed-scalloped-potatoes-and-onions/'
 
 measure = ['cup', 'tablespoon', 'teaspoon', 'gram', 'pound',
-        'cups', 'tablespoons', 'teaspoons', 'grams', 'pounds']
+        'cups', 'tablespoons', 'teaspoons', 'grams', 'pounds', 
+        'liter', 'gallon', 'ounce', 'gal', 'oz', 'fl oz', 'fluid ounce', 'bottle', 'can',
+        'liters', 'gallons', 'ounces', 'gals', 'ozs', 'fl ozs', 'fluid ounces', 'bottles', 'cans',
+        'clove', 'dash', 'pinch', 'cube', 'kilogram', 'kg', 'strip', 'piece', 'slice', 'packet', 'package', 'head', 'bunch',
+        'cloves', 'dashes', 'pinches', 'cubes', 'kilograms', 'kgs', 'strips', 'pieces', 'slices', 'packets', 'packages', 'heads', 'bunches'
+        ]
 # incomplete, but a start
 # liters, gallons, oz, fl oz, bottle, abbreviations of the above, pint, mL, quarts, 
 # clove, dash, pinch, cube, can, kg, strip, piece, slice, packet, package, head, bunch
@@ -53,6 +60,8 @@ def fraction_handler(num):
     elif num[-1].isdigit():
         # normal number, ending in [0-9]
         v = float(num)
+    elif num == 'dozen':
+        v = 12
     elif not num[-1].isdigit():
         # no digits.
         return False
@@ -98,8 +107,8 @@ def parse_ingredients(ing):
     info = ing.split()
 
 
-    if fraction_handler(info[0]):
-        amt = fraction_handler(info[0])
+    if fraction_handler(info[0]) or fraction_handler(info[1]):
+        amt = fraction_handler(info[0]) if fraction_handler(info[0]) else 0
 
         if fraction_handler(info[1]):  # mixed fractions will be separated by a space
             amt += fraction_handler(info[1])
@@ -235,7 +244,7 @@ def double(recipe):
     for key in ing:
         if ing[key][0] is not None:
             if 0.5 < ing[key][0] <= 1 and ing[key][1] is not None:
-                ing[key][1] += 's'
+                ing[key][1]= pluralize(ing[key][1])
                 # make plural
             ing[key][0] *= 2
             #print(ing[key])
@@ -351,8 +360,15 @@ def url_to_recipe(url):
 #print(get_steps(url2))
 #print(get_method(url2))
 #print(healthify(url2))
-#print(halve(url_to_recipe(url2))['ingredients'])
+#print(double(url_to_recipe(url2))['ingredients'])
 
 # print(url_to_recipe(url2))
 
-#print(transform(url, Lithuanian_sub))
+print(transform(url, veggies.veg_sub))
+
+print(transform(url2, veggies.veg_sub))
+
+# ok, issue:
+#   it's getting the first thing to come up in veggies, or it isn't getting multi-word replacements.
+#   see: chicken broth. should -> veggie broth, but instead gets chicken -> seitan without seeing "broth"
+#   i may have to implement something that gets the longest possible matching key, if it doesn't go one word at a time

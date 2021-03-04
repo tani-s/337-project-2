@@ -3,7 +3,7 @@ from bs4 import BeautifulSoup
 import requests
 from unicodedata import numeric
 import nltk
-from transform import transform
+
 
 
 url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
@@ -223,6 +223,7 @@ def healthify(url):
         steps.append(health_sub_help(step['text'].lower().strip()))
     return ing_dict, steps
 
+
 def health_sub_help(step):
     next = step
     for i in health_sub:
@@ -295,6 +296,34 @@ def halve(recipe):
     }
     return halved
 
+def transform(url, food_sub):
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    instructions = j[1]['recipeInstructions']
+
+    page = requests.get(url)
+    soup = BeautifulSoup(page.text, 'html.parser')
+    s = soup.find('script', type='application/ld+json')
+    j = json.loads(s.string)
+    ingredients = j[1]['recipeIngredient']
+
+    ing_dict = {}
+    for ing in ingredients:
+        lst = parse_ingredients(ing)
+        ing_dict[transform_help(lst[2], food_sub)] = [lst[0], lst[1]]
+
+    steps = []
+    for step in instructions:
+        steps.append(transform_help(step['text'].lower().strip(), food_sub))
+    return ing_dict, steps
+
+def transform_help(step, food_sub):
+    next = step
+    for i in food_sub:
+        next = next.replace(i, food_sub[i])
+    return next
 
 
 
@@ -322,6 +351,8 @@ def url_to_recipe(url):
 #print(get_steps(url2))
 #print(get_method(url2))
 #print(healthify(url2))
-print(halve(url_to_recipe(url2))['ingredients'])
+#print(halve(url_to_recipe(url2))['ingredients'])
 
 # print(url_to_recipe(url2))
+
+#print(transform(url, Lithuanian_sub))

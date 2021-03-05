@@ -122,8 +122,10 @@ def parse_ingredients(ing):
         if chk.label() == 'n':
             if name != '': name += ' '
             name += ' '.join([x[0] for x in chk.leaves()])
-        if chk.label() == 'preparation' or chk.label() == 'phrase':
+        if chk.label() == 'preparation':
             prep.append(' '.join([x[0] for x in chk.leaves()]))
+        if chk.label() == 'phrase':
+            prep[len(prep) - 1] += ' ' + ' '.join([x[0] for x in chk.leaves()])
         if chk.label() == 'descriptor':
             desc.append(' '.join([x[0] for x in chk.leaves()]))
     
@@ -134,3 +136,26 @@ def parse_ingredients(ing):
 
 #print(get_ingredients(url))
 #print(get_ingredients(url2))
+
+def ing_print(ing_dict):
+    print('Ingredients:\n')
+
+    for i in ing_dict.keys():
+        print(i + ':')
+        if ing_dict[i][4]:
+            print('Quantity: %s, or as needed' %ing_dict[i][0])
+        else:
+            print('Quantity: %s' %ing_dict[i][0])
+        
+        print('Measurement: %s' %ing_dict[i][1])
+        if len(ing_dict[i][2]) > 1: 
+            print('Descriptor: ' + ', '.join(ing_dict[i][2]))
+        else:
+            print('Descriptor: %s' %ing_dict[i][2])
+        
+        if len(ing_dict[i][3]) > 1: 
+            print('Preparation: ' + ', '.join(ing_dict[i][3]))
+        else:
+            print('Preparation: %s' %ing_dict[i][3])
+
+ing_print(get_ingredients(url))

@@ -8,6 +8,7 @@ from pattern.en import pluralize
 import veggies
 import pprint
 import ingPy
+from helper import get_after_prefix, apply
 
 
 
@@ -27,6 +28,9 @@ tools = {"cut": "knife",
         "whisk": "whisk",  # "whisk with a fork" is a possibility...
         "grate": "grater",
         "stir": "spoon"}
+
+tool_phrases = ["using a", "use a", "with a", "in a", "in the"]
+tool_phrases = apply(nltk.word_tokenize, tool_phrases)
 
 methods = ["saute", "boil", "bake", "sear", "braise", "fry", "poach"]
 
@@ -95,14 +99,27 @@ def get_tools(url):
     instructions = j[1]['recipeInstructions']
 
     tool=set()  # so we don't get duplicates
+    
+    tool1=set()
     for step in instructions:
         for word in step['text'].lower().split():
             if word in tools:
+                tool1.add(tools[word])
+    
+    for step in instructions:
+        sent = step['text'].lower()
+        words = nltk.word_tokenize(sent)
+        for word in words:
+            if word in tools:
                 tool.add(tools[word])
-
+        pos = nltk.pos_tag(words)
+        1+1
+        post_phrases = get_after_prefix(words, tool_phrases)
+        for pp in post_phrases:
+            tool.add(pp)
     return tool
 
-#print(get_tools(url))
+print(get_tools(url))
 
 # returns a dict of steps, key = step number, value = action, ingredients, tools, time
 def get_steps(url):

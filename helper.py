@@ -1,11 +1,13 @@
 import nltk
 
 
-
 def get_after_prefix(paragraph, phrases):
+"""
+@paragraph should be a word tokenized paragraph
+@phrases should be a LIST of word tokenized phrases
+"""
     post = set()
     for p in phrases:
-        #p = nltk.word_tokenize(phrase)
         for i in range(len(paragraph)):
             if p[0] == paragraph[i]:
                 match = True

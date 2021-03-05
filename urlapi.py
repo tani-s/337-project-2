@@ -4,7 +4,7 @@ import requests
 from unicodedata import numeric
 import nltk
 import re
-from pattern.en import pluralize
+#from pattern.en import pluralize
 import veggies
 import pprint
 import ingPy
@@ -126,7 +126,7 @@ def get_tools(url):
             
     return tool
 
-print(get_tools(url))
+#print(get_tools(url))
 
 # returns a dict of steps, key = step number, value = action, ingredients, tools, time
 def get_steps(url):
@@ -274,7 +274,7 @@ def halve(recipe):
     
     for key in ing.copy():
         if ing[key][0] is not None:
-            if 1 < ing[key][0] <= 2:
+            if 1 < ing[key][0] <= 2:  # plurals need changing
                 if ing[key][1] is not None:
                     ing_lst = ing[key][1].split()
                     i = 0
@@ -303,7 +303,8 @@ def halve(recipe):
                     
                 # could be chicken BREASTS or CLOVES garlic
                 # de-pluralize
-            
+            else: 
+                ing[key][0] /= 2
             #print(ing[key])
 
     halved = {
@@ -380,7 +381,17 @@ def url_to_recipe(url):
 #print(transform(url2, veggies.veg_sub))
 
 #print(transform(url2, dairy_free_sub))
-
+def url_to_transform(url, transform):
+    ing, steps = transform(url)
+    
+    recipe = {
+        'name': get_recipe_name(url),
+        'ingredients': ing,
+        'tools': get_tools(url),
+        'method': get_method(url),
+        'steps': steps,
+    }
+    return recipe
 
 def veg_transform(url):
     page = requests.get(url)
@@ -415,6 +426,53 @@ def veg_transform_help(step):
 #print(veg_transform(url))
 #print(veg_transform(url2))
 
-
+def main():
+    url = input("Enter a URL to parse!\n")
+    while "allrecipes" not in url:
+        url = input("URL invalid (must be allrecipes). Try again:")
+    function = input('''What would you like to do? \n 
+    [a] Parse as-is
+    [b] Transform to vegetarian 
+    [c] Double the recipe
+    [d] Halve the recipe
+    [e] Transform to Lithuanian
+    [f] Transform to healthy
+    ''')
+    if function == 'a' or function == 'A':
+        recipe = url_to_recipe(url)
+        print('Recipe name: ' + recipe['name'])
+        ingPy.ing_print(recipe['ingredients'])
+        print('Tools: %s' %recipe['tools'])
+        print('Primary method: %s' %recipe['method'])
+        print('Steps: ')
+        pprint.pprint(recipe['steps'])
+    elif function == 'b' or function == 'B':
+        recipe = url_to_transform(url, veg_transform)
+        print('Recipe name: ' + recipe['name'])
+        ingPy.ing_print(recipe['ingredients'])
+        print('Tools: %s' %recipe['tools'])
+        print('Primary method: %s' %recipe['method'])
+        print('Steps: ')
+        pprint.pprint(recipe['steps'])
+    elif function == 'c' or function == 'C':
+        recipe = double(url_to_recipe(url))
+        print('Recipe name: ' + recipe['name'])
+        ingPy.ing_print(recipe['ingredients'])
+        print('Tools: %s' %recipe['tools'])
+        print('Primary method: %s' %recipe['method'])
+        print('Steps: ')
+        pprint.pprint(recipe['steps'])
+    elif function == 'd' or function == 'D':
+        recipe = halve(url_to_recipe(url))
+        print('Recipe name: ' + recipe['name'])
+        ingPy.ing_print(recipe['ingredients'])
+        print('Tools: %s' %recipe['tools'])
+        print('Primary method: %s' %recipe['method'])
+        print('Steps: ')
+        pprint.pprint(recipe['steps'])
+main()
+url3 = 'https://www.allrecipes.com/recipe/166583/spicy-chipotle-turkey-burgers/?internalSource=hub%20recipe&referringContentType=Search'
+#print(double(url_to_recipe(url2)))
+#print(halve(url_to_recipe(url2)))
 
 

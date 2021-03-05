@@ -4,7 +4,7 @@ import requests
 from unicodedata import numeric
 import nltk
 import re
-from pattern.en import pluralize
+#from pattern.en import pluralize
 import veggies
 # Ingredient getter + parser
 
@@ -122,10 +122,10 @@ def parse_ingredients(ing):
         if chk.label() == 'n':
             if name != '': name += ' '
             name += ' '.join([x[0] for x in chk.leaves()])
-        if chk.label() == 'preparation':
-            prep.append(' '.join([x[0] for x in chk.leaves()]))
-        if chk.label() == 'phrase':
-            prep[len(prep) - 1] += ' ' + ' '.join([x[0] for x in chk.leaves()])
+        if chk.label() == 'preparation' or chk.label() == 'phrase':
+            if chk.label() == 'phrase' and len(prep) > 0:
+                prep[len(prep) - 1] += ' ' + ' '.join([x[0] for x in chk.leaves()])
+            else: prep.append(' '.join([x[0] for x in chk.leaves()]))
         if chk.label() == 'descriptor':
             desc.append(' '.join([x[0] for x in chk.leaves()]))
     
@@ -138,10 +138,10 @@ def parse_ingredients(ing):
 #print(get_ingredients(url2))
 
 def ing_print(ing_dict):
-    print('Ingredients:\n')
+    print('Ingredients:')
 
     for i in ing_dict.keys():
-        print(i + ':')
+        print('\n'+i + ':')
         if ing_dict[i][4]:
             print('Quantity: %s, or as needed' %ing_dict[i][0])
         else:
@@ -158,4 +158,4 @@ def ing_print(ing_dict):
         else:
             print('Preparation: %s' %ing_dict[i][3])
 
-ing_print(get_ingredients(url))
+#ing_print(get_ingredients(url))

@@ -8,7 +8,7 @@ from pattern.en import pluralize
 import veggies
 import pprint
 import ingPy
-from helper import get_after_prefix, apply
+from helper import get_after_prefix, apply, get_POS_after_prefix
 
 
 
@@ -20,6 +20,8 @@ url2 = 'https://www.allrecipes.com/recipe/228122/herbed-scalloped-potatoes-and-o
 # incomplete, but a start
 # liters, gallons, oz, fl oz, bottle, abbreviations of the above, pint, mL, quarts, 
 # clove, dash, pinch, cube, can, kg, strip, piece, slice, packet, package, head, bunch
+nouns = ["NN","NNP","NNS"]
+adj = ["JJ","JJR","JJS","DT"]
 
 tools = {"cut": "knife",
         "chop": "knife",
@@ -31,6 +33,9 @@ tools = {"cut": "knife",
 
 tool_phrases = ["using a", "use a", "with a", "in a", "in the"]
 tool_phrases = apply(nltk.word_tokenize, tool_phrases)
+
+tool_phrases2 = ["using", "use", "with", "in"]
+tool_phrases2 = apply(nltk.word_tokenize, tool_phrases2)
 
 methods = ["saute", "boil", "bake", "sear", "braise", "fry", "poach"]
 
@@ -114,9 +119,11 @@ def get_tools(url):
                 tool.add(tools[word])
         pos = nltk.pos_tag(words)
         1+1
-        post_phrases = get_after_prefix(words, tool_phrases)
+        #post_phrases = get_after_prefix(words, tool_phrases)
+        post_phrases = get_POS_after_prefix(pos, tool_phrases2, adj, ignore=True)
         for pp in post_phrases:
             tool.add(pp)
+            
     return tool
 
 print(get_tools(url))

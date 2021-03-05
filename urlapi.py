@@ -103,7 +103,7 @@ def get_ingredients(url):
 
 # helper function for get_ingredients.
 def parse_ingredients(ing):
-    #amount, measurement, description
+    #amount, measurement, description, adjectives
     amt = None
     mes = None
     desc = ing.split()
@@ -367,7 +367,8 @@ def url_to_recipe(url):
     }
     return recipe
 
-#print(get_ingredients(url2))
+print(get_ingredients(url))
+print(get_ingredients(url2))
 #print(get_tools(url2))
 #print(get_steps(url2))
 #print(get_method(url2))
@@ -414,18 +415,12 @@ def veg_transform(url):
 
 def veg_transform_help(step):
     n = step
-    for k in sorted(veggies.veg_sub, key= len, reverse=True):
-        rep = r"\b" + k
+    for k in sorted(veggies.veg_sub, key= len, reverse=True):  # longest (more detailed) transforms first
+        rep = r"\b" + k  # only make tranformations on words at the word boundary
         n = re.sub(rep, veggies.veg_sub[k], n)
-        #n.replace(k, veggies.veg_sub[k])
     return n
 
-#k = 'chicken'
-#regex = r"\b" + k
-
-#print(regex)
-#print(re.sub(regex, 'tofu', 'low-sodium chicken broth'))
-print(veg_transform(url))
+#print(veg_transform(url))
 
 
 

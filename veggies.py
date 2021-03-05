@@ -1,17 +1,6 @@
 # "Vegetarian": someone that does not eat meat but does consume 
 # animal products that do not require the death of that animal.
 # i.e., milk, eggs, cheese, and butter allowed, but not meat.
-
-veg_sub = {
-    'chicken': "seitan",
-    "pork" : "portobello",
-    'fish sauce': 'hoisin',
-    'oyster sauce': 'hoisin',
-    'pepperoni': 'seitan deli slices',
-    'salami': 'seitan deli slices'
-} 
-
-
 #   replace all animal broths + stocks with veggie broth
 #   replace all ground meat with beyond meat / ground meat alternative
 #   replace all burgers/ patties with veggie burgers/patties
@@ -21,9 +10,18 @@ veg_sub = {
 #   replace shellfish (crab, scallops, clam, oyster, shrimp) with tofu
 #   replace chicken with seitan
 #   replace pork with portobello
-# replace all deli meats (sliced turkey, ham, etc) with seitan deli slices
+#   replace all deli meats (sliced turkey, ham, etc) with seitan deli slices
 #   replace fish sauce and oyster sauce with hoisin
 #   TIL eel sauce is vegan
+
+veg_sub = {
+    'chicken': "seitan",
+    "pork" : "portobello",
+    'fish sauce': 'hoisin',
+    'oyster sauce': 'hoisin',
+    'pepperoni': 'seitan deli slices',
+    'salami': 'seitan deli slices'
+} 
 
 animals = [
     'beef', 'veal', 'chicken', 'poultry', 'turkey', 'pork', 'ham', 'lamb', 'fish', 'seafood', 'fish' 

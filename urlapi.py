@@ -7,6 +7,7 @@ import re
 from pattern.en import pluralize
 import veggies
 import pprint
+import ingPy
 
 
 
@@ -89,51 +90,6 @@ def get_recipe_name(url):
     return recipe_name
 
 
-# given a URL, returns a dictionary of ingredients that maps to a list containing
-#   the amount (in index 0) and the measure (index 1).
-def get_ingredients(url):
-    page = requests.get(url)
-    soup = BeautifulSoup(page.text, 'html.parser')
-    s = soup.find('script', type='application/ld+json')
-    j = json.loads(s.string)
-    ingredients = j[1]['recipeIngredient']
-
-    ing_dict = {}
-    for ing in ingredients:
-        lst = parse_ingredients(ing)
-        ing_dict[lst[2]] = [lst[0], lst[1]]
-
-    return ing_dict
-
-
-# helper function for get_ingredients.
-def parse_ingredients(ing):
-    #amount, measurement, description, adjectives
-    amt = None
-    mes = None
-    desc = ing.split()
-
-    info = ing.split()
-
-
-    if fraction_handler(info[0]) or fraction_handler(info[1]):
-        amt = fraction_handler(info[0]) if fraction_handler(info[0]) else 0
-
-        if fraction_handler(info[1]):  # mixed fractions will be separated by a space
-            amt += fraction_handler(info[1])
-            desc.remove(info[1])
-
-        desc.remove(info[0])
-
-    if desc[0] in measure:
-        mes = desc[0]
-        desc.remove(desc[0])
-
-    desc = ' '.join(desc)
-    return [amt, mes, desc]
-#print(get_ingredients(url))
-
-
 # When given a url, returns a list of tools based on the tools dict defined at top
 # We should probably add something to scan for ... Nouns? things like "oven", "pan", "plate", etc.
 # Also for phrases like "With a spoon, xyz" or "use a spatula to xyz"
@@ -161,7 +117,7 @@ def get_steps(url):
     s = soup.find('script', type='application/ld+json')
     j = json.loads(s.string)
     instructions = j[1]['recipeInstructions']
-    ingredients = get_ingredients(url)
+    ingredients = ingPy.get_ingredients(url)
 
     # splitting into individual steps (by sentence, and splitting up ;s)
     steps = []
@@ -220,8 +176,8 @@ def get_steps(url):
     print("STEP NUMBER: ACTION, INGREDIENTS, TOOLS, TIME")
     return instruc
 
-pprint.pprint(get_steps(url2))
-pprint.pprint(get_steps(url))
+#pprint.pprint(get_steps(url2))
+#pprint.pprint(get_steps(url))
 
 
 def get_method(url):
@@ -260,8 +216,8 @@ def healthify(url):
 
     ing_dict = {}
     for ing in ingredients:
-        lst = parse_ingredients(ing)
-        ing_dict[health_sub_help(lst[2])] = [lst[0], lst[1]]
+        lst = ingPy.parse_ingredients(ing)
+        ing_dict[health_sub_help(lst[2])] = [lst[0], lst[1], lst[3], lst[4], lst[5]]
 
     steps = []
     for step in instructions:
@@ -356,8 +312,8 @@ def transform(url, food_sub):
 
     ing_dict = {}
     for ing in ingredients:
-        lst = parse_ingredients(ing)
-        ing_dict[transform_help(lst[2], food_sub)] = [lst[0], lst[1]]
+        lst = ingPy.parse_ingredients(ing)
+        ing_dict[transform_help(lst[2], food_sub)] = [lst[0], lst[1], lst[3], lst[4], lst[5]]
 
     steps = []
     for step in instructions:
@@ -384,15 +340,15 @@ def find_all(a_str, sub):
 def url_to_recipe(url):
     recipe = {
         'name': get_recipe_name(url),
-        'ingredients': get_ingredients(url),
+        'ingredients': ingPy.get_ingredients(url),
         'tools': get_tools(url),
         'method': get_method(url),
         'steps': get_steps(url),
     }
     return recipe
 
-print(get_ingredients(url))
-print(get_ingredients(url2))
+#print(ingredients.get_ingredients(url))
+#print(ingredients.get_ingredients(url2))
 #print(get_tools(url2))
 #print(get_steps(url2))
 #print(get_method(url2))
@@ -429,8 +385,8 @@ def veg_transform(url):
 
     ing_dict = {}
     for ing in ingredients:
-        lst = parse_ingredients(ing)
-        ing_dict[veg_transform_help(lst[2])] = [lst[0], lst[1]]
+        lst = ingPy.parse_ingredients(ing)
+        ing_dict[veg_transform_help(lst[2])] = [lst[0], lst[1], lst[3], lst[4], lst[5]]
 
     steps = []
     for step in instructions:
@@ -444,7 +400,8 @@ def veg_transform_help(step):
         n = re.sub(rep, veggies.veg_sub[k], n)
     return n
 
-#print(veg_transform(url))
+print(veg_transform(url))
+print(veg_transform(url2))
 
 
 

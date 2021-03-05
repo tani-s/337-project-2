@@ -78,4 +78,7 @@ for a in animals:
     f = 'sliced ' + a
     veg_sub[f] = 'seitan deli slices'
 
+for a in animals:
+    veg_sub[a] = 'veggie'
+
 # print(veg_sub)

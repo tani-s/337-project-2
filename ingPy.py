@@ -120,6 +120,7 @@ def parse_ingredients(ing):
     #tree.draw()
     for chk in tree.subtrees():
         if chk.label() == 'n':
+            if name != '': name += ' '
             name += ' '.join([x[0] for x in chk.leaves()])
         if chk.label() == 'preparation' or chk.label() == 'phrase':
             prep.append(' '.join([x[0] for x in chk.leaves()]))
@@ -131,5 +132,5 @@ def parse_ingredients(ing):
     
     return [amt, mes, name, desc, prep, as_needed]
 
-print(get_ingredients(url))
-print(get_ingredients(url2))
+#print(get_ingredients(url))
+#print(get_ingredients(url2))

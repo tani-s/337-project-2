@@ -6,6 +6,7 @@ import nltk
 import re
 from pattern.en import pluralize
 import veggies
+import pprint
 
 
 
@@ -34,7 +35,11 @@ tools = {"cut": "knife",
 
 methods = ["saute", "boil", "bake", "sear", "braise", "fry", "poach"]
 
-time_measure = ["second", "seconds", "minute", "minutes", "hour", "hours"]
+tools_2 = ["oven", "baking sheet", "baking dish", "pan", "saucepan", "skillet", "pot",
+        "spatula", "fork", "foil", "knife", "whisk", "grater", "spoon"]
+
+time_measure = ["second", "minute", "hour", "seconds", "minutes", "hours"]
+
 health_sub = {"butter": "olive oil",
         "sugar": "zero calorie sweetener",
         "lard": "olive oil"}
@@ -149,56 +154,75 @@ def get_tools(url):
 
 #print(get_tools(url))
 
-# returns the given steps of the recipe in a list, split by sentence
-# could be split into more steps, by looking for imperatives? each imperative verb starts a new step?
+# returns a dict of steps, key = step number, value = action, ingredients, tools, time
 def get_steps(url):
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
     s = soup.find('script', type='application/ld+json')
     j = json.loads(s.string)
     instructions = j[1]['recipeInstructions']
+    ingredients = get_ingredients(url)
 
+    # splitting into individual steps (by sentence, and splitting up ;s)
     steps = []
     for step in instructions:
         ss = nltk.sent_tokenize(step['text'].lower().strip())
         for s in ss:
-            steps.append(s)
-    return steps
+            if ";" in s:
+                split = s.split("; ")
+                steps.append(split[0])
+                steps.append(split[1])
+            else: steps.append(s)
 
-    # below was trying to use a pos tagger to parse out verbs and nouns into ingredients/tools
-    # partially not working bc pos tagger is labeling things wrong, partially bc of ingredients
-    # with two words (lemon juice) gets split up
-    '''ingredients = get_ingredients(url)
-    tools = get_tools(url)
     instruc = {}
     step_num = 0
-    for sent in steps:
-        step_num += 1
-        text = nlp(sent)
+    for step in steps:
         ingred = []
         tools = []
-        time = None
-        method = []
+        action = []
+        time = []
+        toks = nltk.word_tokenize(step)
+        pos = nltk.pos_tag(toks)
+
+        # getting ingredients from looking through ingredients list from get_ingredients
+        # parsing through those ingredients bc usually they'll just say 'chicken' instead of 'skinless chicken breast' for example
         for i in ingredients:
-            if i in sent:
+            if i in step:
                 ingred.append(i)
-        if text[0].pos_ != 'VERB':
-            method.append(text[0])
-        # first word automatically a method
-        for word in text:
-            if word.pos_ == 'VERB':
-                method.append(word) 
-            #elif word.pos_ == 'NOUN':
-            #    if word in tools:
-            #        tools.append()
-            #    elif word.dep_ == 'dobj': 
-            #        ingred.append(word)
+            tok = nltk.word_tokenize(i)
+            tok = nltk.pos_tag(tok)
+            for word in tok:
+                if word[0] in step and (word[1] == "NN" or word[1] == "NNS"):
+                    ingred.append(word[0])
+        
+        # getting tools, but from the list of commonly used tools at the top
+        # could be altered to use get_tools
+        for t in tools_2:
+            if t in step:
+                tools.append(t)
+        
+        # assuming first word is always an action verb, then also looking for other verbs
+        action.append(pos[0][0])
+        for word in pos:
+            if word[1] == 'VB':
+                action.append(word[0])
+        
+        # getting time...most steps dont have a time to it'll return an empty list for that
+        for m in time_measure:
+            if m in toks:
+                #time = m
+                index = toks.index(m)
+                time.append(toks[index-1] + " " + toks[index])
+                #time = index
 
-        instruc[step_num] = [method, tools, ingred]
-    return instruc'''
+        step_num += 1
+        instruc[step_num] =  list(set(action)), list(set(ingred)), tools, time
+    print("STEP NUMBER: ACTION, INGREDIENTS, TOOLS, TIME")
+    return instruc
 
+pprint.pprint(get_steps(url2))
+pprint.pprint(get_steps(url))
 
-#print(get_steps(url))
 
 def get_method(url):
     page = requests.get(url)

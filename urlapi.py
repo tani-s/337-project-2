@@ -31,7 +31,7 @@ tools = {"cut": "knife",
         "mince": "knife",
         "whisk": "whisk",  # "whisk with a fork" is a possibility...
         "grate": "grater",
-        "stir": "spoon"
+        "stir": "spoon",
         "grill": "grill"}
 
 tool_phrases = ["using a", "use a", "with a", "in a", "in the"]
@@ -137,9 +137,11 @@ def get_tools(url):
             
     return tool
 
+"""
 get_tools(url)
 get_tools(url2)
 get_tools(url3)
+"""
 
 # returns a dict of steps, key = step number, value = action, ingredients, tools, time
 def get_steps(url):
@@ -358,7 +360,11 @@ def transform_help(step, food_sub):
         next = next.replace(i, food_sub[i])
     return next
 
-
+"""
+print(transform(url, Lithuanian_sub))
+print(transform(url2, Lithuanian_sub))
+print(transform(url3, Lithuanian_sub))
+"""
 
 # credit for this function to https://stackoverflow.com/questions/4664850/how-to-find-all-occurrences-of-a-substring
 def find_all(a_str, sub):

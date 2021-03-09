@@ -71,4 +71,4 @@ para = nltk.word_tokenize(para)
 #print(get_after_prefix(para, p))
 
 para = nltk.pos_tag(para)
-print(get_POS_after_prefix(para, p, adj,ignore=True))
+#print(get_POS_after_prefix(para, p, adj,ignore=True))

@@ -64,11 +64,15 @@ Lithuanian_sub = {"vegetable oil": "flaxseed oil", "coconut oil": "flaxseed oil"
      "beer": "farmhouse brewed beer", "wine": "fruit wine","coffee": "kava",
      "goose": "chicken", "mutton": "lamb", "veal": "lamb", "rabbit": "lamb",
      "walleye": "zander", "cod": "perch", "tuna": "pike",
-     "basil": "bay leaf", "rosemary": "caraway", "thyme": "coriander" ,"parsley": "horseradish", 
-     "wheat bread": "rye bread", "bagel": "rye bread", "biscuit": "rye bread", "brioche": "rye bread",
-     "ciabatta":"rye bread", "naan": "rye bread","pita": "rye bread", "sourdough bread": "rye bread", "french bread": "rye bread",
+     "basil": "bay leaf", "rosemary": "caraway", "thyme": "coriander" ,"parsley": "horseradish",
+     "paprika": "coriander", "saffron": "oregano", "cumin": "horseradish", 
+     "wheat bread": "rye bread", "bagel": "rye bread", "biscuit": "rye bread", "brioche": "rye",
+     "ciabatta":"rye", "naan": "rye bread","pita": "rye bread", "chile": "garlic",
+     "wasabi": "horseradish","fennel": "bay leaf","chives": "coriander","sage":"bay leaf",
      "lemon": "apple", "orange": "apricot", "pineapple": "plum", "banana": "pear",
-     "lettuce": "cabbage"}
+     "lettuce": "cabbage",
+     "swiss cheese": "dziugas", "blue cheese": "liliputas", "american cheese": "dziugas", "cheddar cheese": "dziugas",
+     "parmesan": "dziugas","mozzarella": "dziugas", "brie": "liliputas"}
 
 dairy_free_sub = {"milk": "soy milk", "butter": "coconut oil", "cream": "coconut cream", 
     "parmesan": "nutritional yeast", "yogurt": "applesauce", "mayonnaise": "vegenaise", "cheese": "vegan cheese"}

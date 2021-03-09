@@ -84,7 +84,7 @@ dairy_free_sub = {"milk": "soy milk", "butter": "coconut oil", "cream": "coconut
 def fraction_handler(num):
     if len(num) == 1:
         v = numeric(num)
-    elif num[-1].isdigit():
+    elif num[-1].isdigit() and num[0].isdigit():
         # normal number, ending in [0-9]
         v = float(num)
     elif num == 'dozen':

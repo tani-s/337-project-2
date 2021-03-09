@@ -26,15 +26,20 @@ measure = ['cup', 'tablespoon', 'teaspoon', 'gram', 'pound',
         'clove', 'dash', 'pinch', 'cube', 'kilogram', 'kg', 'strip', 'piece', 'slice', 'packet', 'package', 'head', 'bunch',
         'cloves', 'dashes', 'pinches', 'cubes', 'kilograms', 'kgs', 'strips', 'pieces', 'slices', 'packets', 'packages', 'heads', 'bunches'
         ]
+
+# credit for this function to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
+# When given a fraction (or int), returns it as a float.
+# When given a non-digit string, returns False.
+# this will work for mixed numbers, like 3⅕ etc.
 def fraction_handler(num):
     if len(num) == 1:
         v = numeric(num)
-    elif num[-1].isdigit():
+    elif num[-1].isdigit() and num[0].isdigit():
         # normal number, ending in [0-9]
         v = float(num)
     elif num == 'dozen':
         v = 12
-    elif not num[-1].isdigit():
+    elif not num[-1].isdigit() or not num[0].isdigit():
         # no digits.
         return False
     else:
@@ -91,9 +96,24 @@ def parse_ingredients(ing):
         name.remove("needed")
         as_needed = True
 
+    # handle size packaging with parens
+    sz = ''
+    if name[0][0] == '(':
+        for i in range(len(name)):
+            if name[i][-1] != ')':
+                sz += name[i]
+                sz += ' '
+            if name[i][-1] == ')':
+                sz += name[i]
+                del name[:i + 1]
+                break
+    if sz != '':
+        mes = sz[1:-1] + ' '
     # Get measurement
     if name[0] in measure:
-        mes = name[0]
+        if mes:
+            mes += name[0]
+        else: mes = name[0]
         name.remove(name[0])
 
     # Chunking rules 

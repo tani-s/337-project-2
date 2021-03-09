@@ -37,16 +37,23 @@ tool_phrases = apply(nltk.word_tokenize, tool_phrases)
 tool_phrases2 = ["using", "use", "with", "in"]
 tool_phrases2 = apply(nltk.word_tokenize, tool_phrases2)
 
-methods = ["saute", "boil", "bake", "sear", "braise", "fry", "poach"]
+methods = ["bake", "fry", "sear", "saute", "boil", "braise", "poach"]
 
 tools_2 = ["oven", "baking sheet", "baking dish", "pan", "saucepan", "skillet", "pot",
         "spatula", "fork", "foil", "knife", "whisk", "grater", "spoon"]
 
 time_measure = ["second", "minute", "hour", "seconds", "minutes", "hours"]
 
-health_sub = {"butter": "olive oil",
+health_sub = {"butter": "coconut oil",
         "sugar": "zero calorie sweetener",
-        "lard": "olive oil"}
+        "lard": "coconut oil",
+    "flour": "whole wheat flour",
+"noodles": "whole grain pasta",
+"spaghetti": "whole grain pasta",
+"linguini": "whole grain pasta",
+"penne": "whole grain pasta",
+"bread": "whole wheat bread"
+}
 
 
 Lithuanian_sub = {"vegetable oil": "flaxseed oil", "coconut oil": "flaxseed oil", "olive oil": "flaxseed oil",
@@ -55,8 +62,8 @@ Lithuanian_sub = {"vegetable oil": "flaxseed oil", "coconut oil": "flaxseed oil"
      "goose": "chicken", "mutton": "lamb", "veal": "lamb", "rabbit": "lamb",
      "walleye": "zander", "cod": "perch", "tuna": "pike",
      "basil": "bay leaf", "rosemary": "caraway", "thyme": "coriander" ,"parsley": "horseradish", 
-     "wheat bread": "rye bread", "bagel": "rye bread", "biscuit": "rye bread", "brioche": "rye",
-     "ciabatta":"rye", "naan": "rye bread","pita": "rye bread",
+     "wheat bread": "rye bread", "bagel": "rye bread", "biscuit": "rye bread", "brioche": "rye bread",
+     "ciabatta":"rye bread", "naan": "rye bread","pita": "rye bread", "sourdough bread": "rye bread", "french bread": "rye bread",
      "lemon": "apple", "orange": "apricot", "pineapple": "plum", "banana": "pear",
      "lettuce": "cabbage"}
 
@@ -210,13 +217,15 @@ def get_method(url):
     for step in instructions:
         split = nltk.word_tokenize(step['text'].lower().strip())
         split = nltk.pos_tag(split)
+        temp = -1
         for i in split:
-            temp = -1
+            if "VB" in i[1] and temp == -1:
+                index = len(methods)
+                main_method = i[0]
             if i[0] in methods:
                 temp = methods.index(i[0])
-            if "VB" in i[1] and temp != -1 and temp < index:
-                index = temp
                 main_method = i[0]
+
     return main_method
 
 def healthify(url):
@@ -393,6 +402,18 @@ def url_to_transform(url, transform):
     }
     return recipe
 
+def url_to_transform_gen(url, third):
+    ing, steps = transform(url, third)
+    
+    recipe = {
+        'name': get_recipe_name(url),
+        'ingredients': ing,
+        'tools': get_tools(url),
+        'method': get_method(url),
+        'steps': steps,
+    }
+    return recipe
+
 def veg_transform(url):
     page = requests.get(url)
     soup = BeautifulSoup(page.text, 'html.parser')
@@ -426,6 +447,35 @@ def veg_transform_help(step):
 #print(veg_transform(url))
 #print(veg_transform(url2))
 
+def printStep(steps):
+    for i in range(1, len(steps) + 1):
+        print ("step number " + str(i))
+        temp = ", "
+        temp = temp.join(steps[i][0])
+        print("     actions: " + temp)
+        if len(steps[i][1]) > 0:
+            temp = ", "
+            temp = temp.join(steps[i][1])
+            print("     ingredients: " + temp)
+        else:
+            print("     no ingredients")
+        if len(steps[i][2]) > 0:
+            temp = ", "
+            temp = temp.join(steps[i][2])
+            print("     tools: " + temp)
+        else:
+            print("     no tools")
+        if len(steps[i][3]) > 0:
+            temp = ", "
+            temp = temp.join(steps[i][3])
+            print("     time: " + temp)
+        else:
+            print("     no time")
+
+def printCount(steps):
+    for i in range(1, len(steps) + 1):
+        print("     " + str(i) + ": " + steps[i - 1])
+
 def main():
     url = input("Enter a URL to parse!\n")
     while "allrecipes" not in url:
@@ -433,8 +483,8 @@ def main():
     function = input('''What would you like to do? \n 
     [a] Parse as-is
     [b] Transform to vegetarian 
-    [c] Double the recipe
-    [d] Halve the recipe
+    [c] Parse with recipe doubled
+    [d] Parse with recipe halved
     [e] Transform to Lithuanian
     [f] Transform to healthy
     ''')
@@ -445,7 +495,7 @@ def main():
         print('Tools: %s' %recipe['tools'])
         print('Primary method: %s' %recipe['method'])
         print('Steps: ')
-        pprint.pprint(recipe['steps'])
+        printStep(recipe['steps'])
     elif function == 'b' or function == 'B':
         recipe = url_to_transform(url, veg_transform)
         print('Recipe name: ' + recipe['name'])
@@ -453,7 +503,7 @@ def main():
         print('Tools: %s' %recipe['tools'])
         print('Primary method: %s' %recipe['method'])
         print('Steps: ')
-        pprint.pprint(recipe['steps'])
+        printCount(recipe['steps'])
     elif function == 'c' or function == 'C':
         recipe = double(url_to_recipe(url))
         print('Recipe name: ' + recipe['name'])
@@ -461,7 +511,7 @@ def main():
         print('Tools: %s' %recipe['tools'])
         print('Primary method: %s' %recipe['method'])
         print('Steps: ')
-        pprint.pprint(recipe['steps'])
+        printStep(recipe['steps'])
     elif function == 'd' or function == 'D':
         recipe = halve(url_to_recipe(url))
         print('Recipe name: ' + recipe['name'])
@@ -469,7 +519,23 @@ def main():
         print('Tools: %s' %recipe['tools'])
         print('Primary method: %s' %recipe['method'])
         print('Steps: ')
-        pprint.pprint(recipe['steps'])
+        printStep(recipe['steps'])
+    elif function == 'e' or function == 'E':
+        recipe = url_to_transform_gen(url, Lithuanian_sub)
+        print('Recipe name: ' + recipe['name'])
+        ingPy.ing_print(recipe['ingredients'])
+        print('Tools: %s' %recipe['tools'])
+        print('Primary method: %s' %recipe['method'])
+        print('Steps: ')
+        printCount(recipe['steps'])
+    elif function == 'f' or function == 'F':
+        recipe = url_to_transform_gen(url, health_sub)
+        print('Recipe name: ' + recipe['name'])
+        ingPy.ing_print(recipe['ingredients'])
+        print('Tools: %s' %recipe['tools'])
+        print('Primary method: %s' %recipe['method'])
+        print('Steps: ')
+        printCount(recipe['steps'])
 main()
 url3 = 'https://www.allrecipes.com/recipe/166583/spicy-chipotle-turkey-burgers/?internalSource=hub%20recipe&referringContentType=Search'
 #print(double(url_to_recipe(url2)))

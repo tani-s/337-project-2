@@ -16,6 +16,8 @@ url = 'https://www.allrecipes.com/recipe/273864/greek-chicken-skewers/'
 
 url2 = 'https://www.allrecipes.com/recipe/228122/herbed-scalloped-potatoes-and-onions/'
 
+url3 = 'https://www.allrecipes.com/recipe/166583/spicy-chipotle-turkey-burgers/?internalSource=hub%20recipe&referringContentType=Search'
+
 
 # incomplete, but a start
 # liters, gallons, oz, fl oz, bottle, abbreviations of the above, pint, mL, quarts, 
@@ -29,12 +31,13 @@ tools = {"cut": "knife",
         "mince": "knife",
         "whisk": "whisk",  # "whisk with a fork" is a possibility...
         "grate": "grater",
-        "stir": "spoon"}
+        "stir": "spoon",
+        "grill": "grill"}
 
 tool_phrases = ["using a", "use a", "with a", "in a", "in the"]
 tool_phrases = apply(nltk.word_tokenize, tool_phrases)
 
-tool_phrases2 = ["using", "use", "with", "in"]
+tool_phrases2 = ["using", "use", "in"]
 tool_phrases2 = apply(nltk.word_tokenize, tool_phrases2)
 
 methods = ["bake", "fry", "sear", "saute", "boil", "braise", "poach"]
@@ -112,11 +115,13 @@ def get_tools(url):
 
     tool=set()  # so we don't get duplicates
     
+    """
     tool1=set()
     for step in instructions:
         for word in step['text'].lower().split():
             if word in tools:
                 tool1.add(tools[word])
+    """
     
     for step in instructions:
         sent = step['text'].lower()
@@ -125,15 +130,25 @@ def get_tools(url):
             if word in tools:
                 tool.add(tools[word])
         pos = nltk.pos_tag(words)
-        1+1
         #post_phrases = get_after_prefix(words, tool_phrases)
         post_phrases = get_POS_after_prefix(pos, tool_phrases2, adj, ignore=True)
         for pp in post_phrases:
             tool.add(pp)
+
+    ing = ingPy.get_ingredients(url)
+    for i in ing:
+        ing_words = i.split()
+        for w in ing_words:
+            if w in tool:
+                tool.remove(w)
             
     return tool
 
-#print(get_tools(url))
+"""
+get_tools(url)
+get_tools(url2)
+get_tools(url3)
+"""
 
 # returns a dict of steps, key = step number, value = action, ingredients, tools, time
 def get_steps(url):
@@ -354,7 +369,11 @@ def transform_help(step, food_sub):
         next = next.replace(i, food_sub[i])
     return next
 
-
+"""
+print(transform(url, Lithuanian_sub))
+print(transform(url2, Lithuanian_sub))
+print(transform(url3, Lithuanian_sub))
+"""
 
 # credit for this function to https://stackoverflow.com/questions/4664850/how-to-find-all-occurrences-of-a-substring
 def find_all(a_str, sub):
@@ -537,7 +556,7 @@ def main():
         print('Steps: ')
         printCount(recipe['steps'])
 main()
-url3 = 'https://www.allrecipes.com/recipe/166583/spicy-chipotle-turkey-burgers/?internalSource=hub%20recipe&referringContentType=Search'
+
 #print(double(url_to_recipe(url2)))
 #print(halve(url_to_recipe(url2)))
 

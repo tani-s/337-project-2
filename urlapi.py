@@ -40,7 +40,7 @@ tool_phrases = apply(nltk.word_tokenize, tool_phrases)
 tool_phrases2 = ["using", "use", "in"]
 tool_phrases2 = apply(nltk.word_tokenize, tool_phrases2)
 
-methods = ["bake", "fry", "sear", "saute", "boil", "braise", "poach"]
+methods = ["bake", "fry", "sear", "saute", "boil", "braise", "poach", "mix"]
 
 tools_2 = ["oven", "baking sheet", "baking dish", "pan", "saucepan", "skillet", "pot",
         "spatula", "fork", "foil", "knife", "whisk", "grater", "spoon"]
@@ -213,7 +213,6 @@ def get_steps(url):
 
         step_num += 1
         instruc[step_num] =  list(set(action)), list(set(ingred)), tools, time
-    print("STEP NUMBER: ACTION, INGREDIENTS, TOOLS, TIME")
     return instruc
 
 #pprint.pprint(get_steps(url2))
@@ -229,17 +228,18 @@ def get_method(url):
 
     main_method = ""
     index = 12
+    temp = -1
     for step in instructions:
         split = nltk.word_tokenize(step['text'].lower().strip())
         split = nltk.pos_tag(split)
-        temp = -1
         for i in split:
             if "VB" in i[1] and temp == -1:
                 index = len(methods)
                 main_method = i[0]
             if i[0] in methods:
-                temp = methods.index(i[0])
-                main_method = i[0]
+                if (methods.index(i[0]) < temp and temp != -1) or temp == -1:
+                    temp = methods.index(i[0])
+                    main_method = i[0]
 
     return main_method
 
@@ -314,7 +314,6 @@ def halve(recipe):
                     ing_lst = key.split()
                     i = 0
                     for word,pos in nltk.pos_tag(ing_lst):
-                        print(word, pos)
                         if pos == 'NNS':
                             ing_lst[i] = p.stem(word)
                         i += 1

@@ -77,25 +77,6 @@ Lithuanian_sub = {"vegetable oil": "flaxseed oil", "coconut oil": "flaxseed oil"
 dairy_free_sub = {"milk": "soy milk", "butter": "coconut oil", "cream": "coconut cream", 
     "parmesan": "nutritional yeast", "yogurt": "applesauce", "mayonnaise": "vegenaise", "cheese": "vegan cheese"}
 
-# credit for this function to https://stackoverflow.com/questions/1263796/how-do-i-convert-unicode-characters-to-floats-in-python
-# When given a fraction (or int), returns it as a float.
-# When given a non-digit string, returns False.
-# this will work for mixed numbers, like 3⅕ etc.
-def fraction_handler(num):
-    if len(num) == 1:
-        v = numeric(num)
-    elif num[-1].isdigit() and num[0].isdigit():
-        # normal number, ending in [0-9]
-        v = float(num)
-    elif num == 'dozen':
-        v = 12
-    elif not num[-1].isdigit():
-        # no digits.
-        return False
-    else:
-        # Assume the last character is a vulgar fraction
-        v = float(num[:-1]) + numeric(num[-1])
-    return v
 
 
 # given a URL, will return the name of the recipe

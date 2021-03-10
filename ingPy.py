@@ -98,17 +98,23 @@ def parse_ingredients(ing):
 
     # handle size packaging with parens
     sz = ''
+    inc = 0
     if name[0][0] == '(':
         for i in range(len(name)):
             if name[i][-1] != ')':
                 sz += name[i]
                 sz += ' '
+                inc+= 1
             if name[i][-1] == ')':
                 sz += name[i]
-                del name[:i + 1]
+                inc += 1
                 break
+    
     if sz != '':
-        mes = sz[1:-1] + ' '
+        print(inc)
+        if name[inc] in measure:
+            del name[:inc]
+            mes = sz[1:-1] + ' '
     # Get measurement
     if name[0] in measure:
         if mes:

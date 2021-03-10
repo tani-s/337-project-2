@@ -111,7 +111,6 @@ def parse_ingredients(ing):
                 break
     
     if sz != '':
-        print(inc)
         if name[inc] in measure:
             del name[:inc]
             mes = sz[1:-1] + ' '

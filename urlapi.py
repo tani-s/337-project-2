@@ -175,7 +175,8 @@ def get_steps(url):
             for word in tok:
                 if word[0] in step and (word[1] == "NN" or word[1] == "NNS"):
                     ingred.append(word[0])
-        
+    
+        ingred = checker(ingred)
         # getting tools, but from the list of commonly used tools at the top
         # could be altered to use get_tools
         for t in tools_2:
@@ -202,6 +203,20 @@ def get_steps(url):
 
 #pprint.pprint(get_steps(url2))
 #pprint.pprint(get_steps(url))
+
+def checker(ingred):
+    out = []
+    for i in range(0, len(ingred)):
+        temp = True
+        for j in range(0, len(ingred)):
+            if ingred[i] in ingred[j] and i != j:
+                temp = False
+        if temp:
+            out.append(ingred[i])
+    return out
+
+
+
 
 
 def get_method(url):
@@ -276,6 +291,8 @@ def double(recipe):
         'steps': recipe['steps'],
     }
     return doubled
+
+
 
 def halve(recipe): 
     ing = recipe['ingredients']
